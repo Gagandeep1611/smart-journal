@@ -1,6 +1,7 @@
+from datetime import datetime
 from typing import TYPE_CHECKING
 
-from sqlalchemy import String
+from sqlalchemy import DateTime, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from smart_journal.db.database import Base
@@ -29,4 +30,10 @@ class User(Base):
     journal_entries: Mapped[list["JournalEntry"]] = relationship(
         back_populates="user",
         cascade="all, delete-orphan",
+    )
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        default=datetime.utcnow,
+        nullable=False,
     )

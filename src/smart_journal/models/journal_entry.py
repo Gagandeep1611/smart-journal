@@ -37,6 +37,13 @@ class JournalEntry(Base):
         nullable=False,
     )
 
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow,
+        nullable=False,
+    )
+
     user: Mapped["User"] = relationship(
         back_populates="journal_entries",
     )

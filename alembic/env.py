@@ -1,13 +1,10 @@
 from logging.config import fileConfig
 
-from sqlalchemy import engine_from_config
-from sqlalchemy import pool
+from sqlalchemy import engine_from_config, pool
 
 from alembic import context
-from smart_journal.db.database import DATABASE_URL
-
-from smart_journal.db.database import Base
-from smart_journal.models import User, JournalEntry
+from smart_journal.db.database import DATABASE_URL, Base
+from smart_journal.models import JournalEntry, User
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -69,9 +66,7 @@ def run_migrations_online() -> None:
     )
 
     with connectable.connect() as connection:
-        context.configure(
-            connection=connection, target_metadata=target_metadata
-        )
+        context.configure(connection=connection, target_metadata=target_metadata)
 
         with context.begin_transaction():
             context.run_migrations()
