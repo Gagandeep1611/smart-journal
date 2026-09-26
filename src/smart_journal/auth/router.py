@@ -1,21 +1,13 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from smart_journal.auth.security import (
-    create_access_token,
-    hash_password,
-    verify_password,
-)
-from fastapi import Depends
 from smart_journal.auth.dependencies import get_current_user
+from smart_journal.auth.security import (create_access_token, hash_password,
+                                         verify_password)
 from smart_journal.db.database import get_db
 from smart_journal.models import User
-from smart_journal.schemas.auth import (
-    TokenResponse,
-    UserLogin,
-    UserRegister,
-    UserResponse,
-)
+from smart_journal.schemas.auth import (TokenResponse, UserLogin, UserRegister,
+                                        UserResponse)
 
 router = APIRouter(
     prefix="/auth",
@@ -77,6 +69,7 @@ def login(
         access_token=access_token,
         token_type="bearer",
     )
+
 
 @router.get("/me", response_model=UserResponse)
 def get_me(

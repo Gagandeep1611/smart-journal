@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 
 from smart_journal.auth.router import router as auth_router
+from smart_journal.journal.router import router as journal_router
 
 app = FastAPI(
     title="Personalized AI Journal",
@@ -8,6 +9,7 @@ app = FastAPI(
     version="1.0.0",
 )
 app.include_router(auth_router)
+app.include_router(journal_router)
 
 
 @app.get("/")
