@@ -799,18 +799,11 @@ Example question:
 What did I work on in Java?
 ```
 
-## Stretch Goals
+## Stretch Goals Implemented
 
-### Implemented
 
 - Update/delete synchronization between journal entries and embeddings
 - Source citations in RAG responses
-
-### Not Implemented
-
-- Streaming responses
-
-Streaming was intentionally left out of the MVP to prioritize authentication, multi-tenancy, vector retrieval, RAG correctness, and provider abstraction.
 
 ## Design Decisions
 
