@@ -6,13 +6,13 @@ from smart_journal.llm.factory import get_llm_provider
 from smart_journal.services.embedding_service import generate_embedding
 from smart_journal.services.vector_service import search_similar_entries
 
-
 logger = logging.getLogger(__name__)
 if not logging.getLogger().handlers:
     logging.basicConfig(
         level=logging.INFO,
         format="%(asctime)s | %(levelname)s | %(name)s | %(message)s",
     )
+
 
 class RAGService:
     def __init__(self, db: Session):
@@ -23,9 +23,9 @@ class RAGService:
         self,
         question: str,
         user_id: int,
-        top_k: int = 5,
+        top_k: int = 3,
         similarity_threshold: float = 0.2,
-    ) -> str:
+    ) -> dict:
         """
         Execute the complete RAG pipeline for one authenticated user.
         """
@@ -92,10 +92,13 @@ class RAGService:
                 user_id,
             )
 
-            return (
-                "I couldn't find any relevant information in your journal "
-                "to answer that question."
-            )
+            return {
+                "answer": (
+                    "I couldn't find any relevant information in your "
+                    "journal to answer that question."
+                ),
+                "sources": [],
+            }
 
         # ---------------------------------------------------------
         # 4. Build context
@@ -127,7 +130,19 @@ class RAGService:
                 user_id,
             )
 
-            return answer
+            sources = [
+                {
+                    "journal_entry_id": result["journal_entry_id"],
+                    "title": result["title"],
+                    "created_at": result["created_at"],
+                }
+                for result in results
+            ]
+
+            return {
+                "answer": answer,
+                "sources": sources,
+            }
 
         except Exception:
             logger.exception(
@@ -145,13 +160,11 @@ class RAGService:
         context_parts = []
 
         for index, result in enumerate(results, start=1):
-            context_parts.append(
-                f"""Journal Entry {index}
-Title: {result["title"]}
-Content: {result["content"]}
-Similarity: {result["similarity"]:.4f}
-"""
-            )
+            context_parts.append(f"""Journal Entry {index}
+                Title: {result["title"]}
+                Content: {result["content"]}
+                Similarity: {result["similarity"]:.4f}
+                """)
 
         return "\n".join(context_parts)
 

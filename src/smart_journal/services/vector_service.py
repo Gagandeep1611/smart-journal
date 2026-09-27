@@ -37,6 +37,7 @@ def search_similar_entries(
             "journal_entry_id": embedding.journal_entry_id,
             "title": journal.title,
             "content": journal.content,
+            "created_at": journal.created_at,
             "similarity": float(similarity),
         }
         for embedding, journal, similarity in results

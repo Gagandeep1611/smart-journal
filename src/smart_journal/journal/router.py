@@ -1,20 +1,16 @@
-from datetime import datetime
-
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from smart_journal.models import JournalEmbedding
-from smart_journal.services.embedding_service import generate_embedding
-from smart_journal.rag.service import RAGService
-from smart_journal.schemas.journal import (
-    JournalChatRequest,
-    JournalChatResponse,
-)
+
 from smart_journal.auth.dependencies import get_current_user
 from smart_journal.db.database import get_db
-from smart_journal.models import JournalEntry, User
-from smart_journal.schemas.journal import (JournalEntryCreate,
+from smart_journal.models import JournalEmbedding, JournalEntry, User
+from smart_journal.rag.service import RAGService
+from smart_journal.schemas.journal import (JournalChatRequest,
+                                           JournalChatResponse,
+                                           JournalEntryCreate,
                                            JournalEntryResponse,
                                            JournalEntryUpdate)
+from smart_journal.services.embedding_service import generate_embedding
 
 router = APIRouter(
     prefix="/journal",
@@ -59,6 +55,7 @@ def create_journal_entry(
     db.refresh(entry)
 
     return entry
+
 
 @router.get(
     "",
@@ -136,7 +133,27 @@ def update_journal_entry(
     if entry_data.content is not None:
         entry.content = entry_data.content
 
-    entry.updated_at = datetime.utcnow()
+    embedding_text = f"{entry.title}\n{entry.content}"
+    new_embedding = generate_embedding(embedding_text)
+
+    journal_embedding = (
+        db.query(JournalEmbedding)
+        .filter(
+            JournalEmbedding.journal_entry_id == entry.id,
+            JournalEmbedding.user_id == current_user.id,
+        )
+        .first()
+    )
+
+    if journal_embedding is None:
+        journal_embedding = JournalEmbedding(
+            journal_entry_id=entry.id,
+            user_id=current_user.id,
+            embedding=new_embedding,
+        )
+        db.add(journal_embedding)
+    else:
+        journal_embedding.embedding = new_embedding
 
     db.commit()
     db.refresh(entry)
@@ -168,10 +185,23 @@ def delete_journal_entry(
             detail="Journal entry not found",
         )
 
+    journal_embedding = (
+        db.query(JournalEmbedding)
+        .filter(
+            JournalEmbedding.journal_entry_id == entry.id,
+            JournalEmbedding.user_id == current_user.id,
+        )
+        .first()
+    )
+
+    if journal_embedding is not None:
+        db.delete(journal_embedding)
+
     db.delete(entry)
     db.commit()
 
     return None
+
 
 @router.post(
     "/chat",
@@ -185,11 +215,12 @@ def chat_with_journal(
 ):
     rag_service = RAGService(db)
 
-    answer = rag_service.answer_question(
+    result = rag_service.answer_question(
         question=request.question,
         user_id=current_user.id,
     )
 
     return JournalChatResponse(
-        answer=answer,
+        answer=result["answer"],
+        sources=result["sources"],
     )

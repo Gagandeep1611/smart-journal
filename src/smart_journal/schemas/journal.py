@@ -35,5 +35,12 @@ class JournalChatRequest(BaseModel):
     question: str
 
 
+class JournalChatSource(BaseModel):
+    journal_entry_id: int
+    title: str
+    created_at: datetime
+
+
 class JournalChatResponse(BaseModel):
     answer: str
+    sources: list[JournalChatSource]

@@ -7,9 +7,8 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from smart_journal.db.database import Base
 
 if TYPE_CHECKING:
-    from smart_journal.models.user import User
     from smart_journal.models.journal_embedding import JournalEmbedding
-
+    from smart_journal.models.user import User
 
 
 class JournalEntry(Base):

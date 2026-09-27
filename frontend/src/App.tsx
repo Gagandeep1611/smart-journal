@@ -35,6 +35,7 @@ function Navigation() {
         <Link className="nav-link" to="/journal">
           Journal
         </Link>
+        <span> | </span>
         <Link className="nav-link" to="/chat">
           Ask AI
         </Link>

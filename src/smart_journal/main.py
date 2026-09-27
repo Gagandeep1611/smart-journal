@@ -1,9 +1,10 @@
+import logging
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-import logging
+
 from smart_journal.auth.router import router as auth_router
 from smart_journal.journal.router import router as journal_router
-
 
 logging.basicConfig(
     level=logging.INFO,

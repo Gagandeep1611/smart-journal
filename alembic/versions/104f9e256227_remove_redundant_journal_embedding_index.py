@@ -8,7 +8,6 @@ from typing import Sequence, Union
 
 from alembic import op
 
-
 revision: str = "104f9e256227"
 down_revision: Union[str, Sequence[str], None] = "1475c8563c3a"
 branch_labels: Union[str, Sequence[str], None] = None
