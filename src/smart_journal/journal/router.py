@@ -2,6 +2,8 @@ from datetime import datetime
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
+from smart_journal.models import JournalEmbedding
+from smart_journal.services.embedding_service import generate_embedding
 
 from smart_journal.auth.dependencies import get_current_user
 from smart_journal.db.database import get_db
@@ -21,6 +23,11 @@ router = APIRouter(
     response_model=JournalEntryResponse,
     status_code=status.HTTP_201_CREATED,
 )
+@router.post(
+    "",
+    response_model=JournalEntryResponse,
+    status_code=status.HTTP_201_CREATED,
+)
 def create_journal_entry(
     entry_data: JournalEntryCreate,
     current_user: User = Depends(get_current_user),
@@ -33,11 +40,26 @@ def create_journal_entry(
     )
 
     db.add(entry)
+
+    # Get the generated journal ID without committing yet.
+    db.flush()
+
+    embedding_text = f"{entry.title}\n{entry.content}"
+
+    embedding = generate_embedding(embedding_text)
+
+    journal_embedding = JournalEmbedding(
+        journal_entry_id=entry.id,
+        user_id=current_user.id,
+        embedding=embedding,
+    )
+
+    db.add(journal_embedding)
+
     db.commit()
     db.refresh(entry)
 
     return entry
-
 
 @router.get(
     "",

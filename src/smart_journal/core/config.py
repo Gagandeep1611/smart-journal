@@ -17,6 +17,11 @@ class Settings(BaseSettings):
     llm_api_key: str = ""
     llm_model: str = ""
 
+    embedding_provider: str = "ollama"
+    embedding_base_url: str = "http://localhost:11434/v1"
+    embedding_api_key: str = ""
+    embedding_model: str = "nomic-embed-text"
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",

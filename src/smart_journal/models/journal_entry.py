@@ -8,6 +8,8 @@ from smart_journal.db.database import Base
 
 if TYPE_CHECKING:
     from smart_journal.models.user import User
+    from smart_journal.models.journal_embedding import JournalEmbedding
+
 
 
 class JournalEntry(Base):
@@ -46,4 +48,10 @@ class JournalEntry(Base):
 
     user: Mapped["User"] = relationship(
         back_populates="journal_entries",
+    )
+
+    embedding: Mapped["JournalEmbedding"] = relationship(
+        back_populates="journal_entry",
+        uselist=False,
+        cascade="all, delete-orphan",
     )

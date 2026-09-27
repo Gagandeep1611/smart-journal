@@ -1,7 +1,14 @@
 from fastapi import FastAPI
-
+import logging
 from smart_journal.auth.router import router as auth_router
 from smart_journal.journal.router import router as journal_router
+
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s | %(levelname)s | %(name)s | %(message)s",
+)
+
 
 app = FastAPI(
     title="Personalized AI Journal",
