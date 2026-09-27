@@ -4,7 +4,11 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from smart_journal.models import JournalEmbedding
 from smart_journal.services.embedding_service import generate_embedding
-
+from smart_journal.rag.service import RAGService
+from smart_journal.schemas.journal import (
+    JournalChatRequest,
+    JournalChatResponse,
+)
 from smart_journal.auth.dependencies import get_current_user
 from smart_journal.db.database import get_db
 from smart_journal.models import JournalEntry, User
@@ -18,11 +22,6 @@ router = APIRouter(
 )
 
 
-@router.post(
-    "",
-    response_model=JournalEntryResponse,
-    status_code=status.HTTP_201_CREATED,
-)
 @router.post(
     "",
     response_model=JournalEntryResponse,
@@ -173,3 +172,24 @@ def delete_journal_entry(
     db.commit()
 
     return None
+
+@router.post(
+    "/chat",
+    response_model=JournalChatResponse,
+    status_code=status.HTTP_200_OK,
+)
+def chat_with_journal(
+    request: JournalChatRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    rag_service = RAGService(db)
+
+    answer = rag_service.answer_question(
+        question=request.question,
+        user_id=current_user.id,
+    )
+
+    return JournalChatResponse(
+        answer=answer,
+    )

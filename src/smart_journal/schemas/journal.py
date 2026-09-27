@@ -29,3 +29,11 @@ class JournalEntryResponse(BaseModel):
     updated_at: datetime
 
     model_config = {"from_attributes": True}
+
+
+class JournalChatRequest(BaseModel):
+    question: str
+
+
+class JournalChatResponse(BaseModel):
+    answer: str
