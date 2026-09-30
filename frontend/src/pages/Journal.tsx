@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
 import apiClient from "../api/client";
+import "./Journal.css";
 
 interface JournalEntry {
   id: number;
@@ -153,141 +154,197 @@ function Journal() {
   };
 
   return (
-    <div>
-      <h1>My Journal</h1>
+  <div className="journal-page">
+    <div className="journal-container">
 
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          value={title}
-          onChange={(event) => setTitle(event.target.value)}
-          placeholder="Entry title"
-          maxLength={255}
-          required
-        />
+      {/* Header */}
+      <header className="journal-header">
+        <p className="journal-eyebrow">Your private space</p>
 
-        <br />
+        <h1>My Journal</h1>
 
-        <textarea
-          value={content}
-          onChange={(event) => setContent(event.target.value)}
-          placeholder="Write something..."
-          rows={8}
-          required
-        />
+        <p className="journal-subtitle">
+          Capture your thoughts, memories, and experiences.
+        </p>
+      </header>
 
-        <br />
+      {/* Create Entry */}
+      <section className="journal-composer">
+        <h2 className="journal-composer-title">
+          Write a new entry
+        </h2>
 
-        <button
-          type="submit"
-          disabled={
-            saving ||
-            !title.trim() ||
-            !content.trim()
-          }
+        <form
+          className="journal-form"
+          onSubmit={handleSubmit}
         >
-          {saving ? "Saving..." : "Save Entry"}
-        </button>
-      </form>
+          <input
+            className="journal-input"
+            type="text"
+            value={title}
+            onChange={(event) => setTitle(event.target.value)}
+            placeholder="Entry title"
+            maxLength={255}
+            required
+          />
 
-      {error && <p>{error}</p>}
+          <textarea
+            className="journal-textarea"
+            value={content}
+            onChange={(event) => setContent(event.target.value)}
+            placeholder="Write something..."
+            rows={8}
+            required
+          />
 
-      <hr />
+          <button
+            className="journal-button"
+            type="submit"
+            disabled={
+              saving ||
+              !title.trim() ||
+              !content.trim()
+            }
+          >
+            {saving ? "Saving..." : "Save Entry"}
+          </button>
+        </form>
+      </section>
 
-      <h2>Previous Entries</h2>
-
-      {loading ? (
-        <p>Loading journal entries...</p>
-      ) : entries.length === 0 ? (
-        <p>No journal entries yet.</p>
-      ) : (
-        entries.map((entry) => (
-          <article key={entry.id}>
-            {editingId === entry.id ? (
-              <form onSubmit={handleUpdate}>
-                <input
-                  type="text"
-                  value={editTitle}
-                  onChange={(event) =>
-                    setEditTitle(event.target.value)
-                  }
-                  maxLength={255}
-                  required
-                />
-
-                <br />
-
-                <textarea
-                  value={editContent}
-                  onChange={(event) =>
-                    setEditContent(event.target.value)
-                  }
-                  rows={8}
-                  required
-                />
-
-                <br />
-
-                <button
-                  type="submit"
-                  disabled={
-                    updating ||
-                    !editTitle.trim() ||
-                    !editContent.trim()
-                  }
-                >
-                  {updating ? "Updating..." : "Save Changes"}
-                </button>
-
-                <button
-                  type="button"
-                  onClick={cancelEditing}
-                  disabled={updating}
-                >
-                  Cancel
-                </button>
-              </form>
-            ) : (
-              <>
-                <h3>{entry.title}</h3>
-
-                <p>{entry.content}</p>
-
-                <small>
-                  {new Date(
-                    entry.created_at
-                  ).toLocaleString()}
-                </small>
-
-                <br />
-
-                <button
-                  type="button"
-                  onClick={() => startEditing(entry)}
-                >
-                  Edit
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() =>
-                    handleDelete(entry.id)
-                  }
-                  disabled={deletingId === entry.id}
-                >
-                  {deletingId === entry.id
-                    ? "Deleting..."
-                    : "Delete"}
-                </button>
-              </>
-            )}
-
-            <hr />
-          </article>
-        ))
+      {/* Error */}
+      {error && (
+        <p className="journal-error">
+          {error}
+        </p>
       )}
+
+      {/* Previous Entries */}
+      <section className="entries-section">
+
+        <div className="entries-header">
+          <h2>Previous Entries</h2>
+
+          {!loading && entries.length > 0 && (
+            <span className="entries-count">
+              {entries.length}{" "}
+              {entries.length === 1 ? "entry" : "entries"}
+            </span>
+          )}
+        </div>
+
+        {loading ? (
+          <div className="journal-status">
+            Loading journal entries...
+          </div>
+        ) : entries.length === 0 ? (
+          <div className="journal-status">
+            No journal entries yet.
+          </div>
+        ) : (
+          entries.map((entry) => (
+            <article
+              className="journal-entry"
+              key={entry.id}
+            >
+              {editingId === entry.id ? (
+                <form
+                  className="edit-form"
+                  onSubmit={handleUpdate}
+                >
+                  <input
+                    className="journal-input"
+                    type="text"
+                    value={editTitle}
+                    onChange={(event) =>
+                      setEditTitle(event.target.value)
+                    }
+                    maxLength={255}
+                    required
+                  />
+
+                  <textarea
+                    className="journal-textarea"
+                    value={editContent}
+                    onChange={(event) =>
+                      setEditContent(event.target.value)
+                    }
+                    rows={8}
+                    required
+                  />
+
+                  <div className="edit-actions">
+                    <button
+                      className="journal-button"
+                      type="submit"
+                      disabled={
+                        updating ||
+                        !editTitle.trim() ||
+                        !editContent.trim()
+                      }
+                    >
+                      {updating
+                        ? "Updating..."
+                        : "Save Changes"}
+                    </button>
+
+                    <button
+                      className="journal-button-secondary"
+                      type="button"
+                      onClick={cancelEditing}
+                      disabled={updating}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </form>
+              ) : (
+                <>
+                  <h3>{entry.title}</h3>
+
+                  <p className="journal-entry-content">
+                    {entry.content}
+                  </p>
+
+                  <small className="journal-entry-date">
+                    {new Date(
+                      entry.created_at
+                    ).toLocaleString()}
+                  </small>
+
+                  <div className="journal-actions">
+                    <button
+                      className="journal-button-secondary"
+                      type="button"
+                      onClick={() => startEditing(entry)}
+                    >
+                      Edit
+                    </button>
+
+                    <button
+                      className="journal-button-danger"
+                      type="button"
+                      onClick={() =>
+                        handleDelete(entry.id)
+                      }
+                      disabled={
+                        deletingId === entry.id
+                      }
+                    >
+                      {deletingId === entry.id
+                        ? "Deleting..."
+                        : "Delete"}
+                    </button>
+                  </div>
+                </>
+              )}
+            </article>
+          ))
+        )}
+
+      </section>
     </div>
-  );
+  </div>
+);
 }
 
 export default Journal;

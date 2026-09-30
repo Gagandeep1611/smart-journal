@@ -3,10 +3,10 @@ import {
   Navigate,
   Route,
   Routes,
-  Link,
   useNavigate,
 } from "react-router-dom";
-
+import { NavLink } from "react-router-dom";
+import "./App.css";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Journal from "./pages/Journal";
@@ -29,19 +29,32 @@ function Navigation() {
 
   return (
     <nav className="app-nav">
-      <div className="brand-mark">Smart Journal</div>
-
-      <div className="nav-links">
-        <Link className="nav-link" to="/journal">
-          Journal
-        </Link>
-        <span> | </span>
-        <Link className="nav-link" to="/chat">
-          Ask AI
-        </Link>
+      <div className="brand-mark">
+        Smart Journal
       </div>
 
-      <button className="nav-logout" onClick={handleLogout}>
+      <div className="nav-links">
+        <NavLink
+          className="nav-link"
+          to="/journal"
+        >
+          Journal
+        </NavLink>
+
+        <span>|</span>
+
+        <NavLink
+          className="nav-link"
+          to="/chat"
+        >
+          Ask AI
+        </NavLink>
+      </div>
+
+      <button
+        className="nav-logout"
+        onClick={handleLogout}
+      >
         Logout
       </button>
     </nav>
